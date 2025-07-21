@@ -1,11 +1,15 @@
 import WallpaperCard from "@/components/WallpaperCard";
 import { getPhotos } from "@/services/unsplash";
 import { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+} from "react-native";
 
 interface Photo {
   id: string;
-  description: string;
   urls: {
     regular: string;
   };
@@ -13,12 +17,21 @@ interface Photo {
 
 export default function HomeScreen() {
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const fetchMorePhotos = async () => {
+    if (loading) return;
+
+    setLoading(true);
+    const newPhotos = await getPhotos(page);
+    setPhotos((prev) => [...prev, ...newPhotos]);
+    setPage((prev) => prev + 1);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    getPhotos().then((photos) => {
-      console.log("🔍 Fotos recebidas:", photos.length);
-      setPhotos(photos);
-    });
+    fetchMorePhotos();
   }, []);
 
   return (
@@ -27,12 +40,15 @@ export default function HomeScreen() {
         data={photos}
         keyExtractor={(item) => item.id}
         numColumns={2}
+        onEndReached={fetchMorePhotos}
+        onEndReachedThreshold={0.5}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 }}
-        columnWrapperStyle={{ gap: 2 }}
         renderItem={({ item }) => (
           <WallpaperCard imageUrl={item.urls.regular} />
         )}
+        ListFooterComponent={
+          loading ? <ActivityIndicator size="small" /> : null
+        }
       />
     </SafeAreaView>
   );
