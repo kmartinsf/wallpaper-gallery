@@ -18,7 +18,6 @@ export const searchPhotos = async (query: string, page = 1, perPage = 20) => {
 };
 
 export const getPhotos = async (page = 1, perPage = 20) => {
-
   const response = await unsplashApi.get("/photos", {
     params: { page, per_page: perPage },
   });
