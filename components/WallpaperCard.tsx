@@ -75,7 +75,7 @@ export default function WallpaperCard({ imageUrl, onPress }: Props) {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    margin: 8,
+    marginBottom: 16,
     aspectRatio: 2 / 3,
   },
   card: {
